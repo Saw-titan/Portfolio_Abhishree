@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Abhishree Shaktawat | Portfolio</title>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030303; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #8b5cf6, #d946ef); border-radius: 3px; }
+        .typing-cursor::after { content: '|'; animation: blink 1s infinite; color: #d946ef; font-weight: bold; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        @keyframes rotateOuter { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .profile-rotate { animation: rotateOuter 20s linear infinite; }
+        .profile-rotate:hover { animation-duration: 8s; }
+        .tilt-card { transform-style: preserve-3d; perspective: 1000px; }
+    </style>
+</head>
+<body class="bg-[#030303] text-zinc-300 relative select-none font-['Plus_Jakarta_Sans'] overflow-x-hidden">
+
+    <div id="cursorFollower" class="w-8 h-8 border border-violet-500/50 bg-violet-500/5 rounded-full fixed pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 transition-[width,height,background-color,border-color] duration-200 mix-blend-screen hidden md:block"></div>
+
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-30"></canvas>
+
+    <div class="fixed top-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full bg-violet-600/5 blur-[100px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-fuchsia-600/5 blur-[100px] pointer-events-none z-0"></div>
+    <div class="fixed top-[40%] left-[30%] w-[20vw] h-[20vw] rounded-full bg-indigo-600/3 blur-[90px] pointer-events-none z-0"></div>
+
+    <nav class="fixed top-0 w-full z-50 bg-[#030303]/60 backdrop-blur-xl border-b border-white/[0.04]">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-white text-xl font-bold tracking-tight hover:opacity-80 transition-opacity flex items-center gap-2 font-['Outfit']">
+                <span class="w-3 h-3 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500"></span>
+                Abhishree<span class="text-violet-400">.dev</span>
+            </a>
+            <div class="hidden md:flex gap-8 text-sm font-medium">
+                <a href="#home" class="nav-link text-white active relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 py-1">Home</a>
+                <a href="#about" class="nav-link text-zinc-400 hover:text-white relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 hover:after:w-full py-1">About</a>
+                <a href="#skills" class="nav-link text-zinc-400 hover:text-white relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 hover:after:w-full py-1">Skills</a>
+                <a href="#experience" class="nav-link text-zinc-400 hover:text-white relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 hover:after:w-full py-1">Experience</a>
+                <a href="#projects" class="nav-link text-zinc-400 hover:text-white relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 hover:after:w-full py-1">Projects</a>
+                <a href="#contact" class="nav-link text-zinc-400 hover:text-white relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 hover:after:w-full py-1">Contact</a>
+            </div>
+            <button id="menuBtn" class="md:hidden text-zinc-300 hover:text-white focus:outline-none text-2xl transition-transform hover:scale-110">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div id="mobileMenu" class="fixed inset-y-0 right-0 w-72 bg-[#050505]/95 backdrop-blur-2xl z-50 pt-24 px-8 border-l border-white/10 shadow-2xl transition-transform duration-300 transform translate-x-full md:hidden">
+        <button id="closeMenu" class="absolute top-5 right-6 text-2xl text-zinc-400 hover:text-white transition-transform hover:scale-110">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="flex flex-col gap-6 font-['Outfit'] text-lg">
+            <a href="#home" class="mobile-link text-zinc-400 hover:text-white transition-colors flex items-center gap-3"><i class="fas fa-home text-violet-500 w-5"></i> Home</a>
+            <a href="#about" class="mobile-link text-zinc-400 hover:text-white transition-colors flex items-center gap-3"><i class="fas fa-user text-violet-500 w-5"></i> About</a>
+            <a href="#skills" class="mobile-link text-zinc-400 hover:text-white transition-colors flex items-center gap-3"><i class="fas fa-cog text-violet-500 w-5"></i> Skills</a>
+            <a href="#experience" class="mobile-link text-zinc-400 hover:text-white transition-colors flex items-center gap-3"><i class="fas fa-briefcase text-violet-500 w-5"></i> Experience</a>
+            <a href="#projects" class="mobile-link text-zinc-400 hover:text-white transition-colors flex items-center gap-3"><i class="fas fa-tasks text-violet-500 w-5"></i> Projects</a>
+            <a href="#contact" class="mobile-link text-zinc-400 hover:text-white transition-colors flex items-center gap-3"><i class="fas fa-paper-plane text-violet-500 w-5"></i> Contact</a>
+        </div>
+    </div>
+
+    <section id="home" class="min-h-screen flex items-center justify-center pt-24 relative overflow-hidden z-10">
+        <div class="max-w-6xl mx-auto px-6 py-12 w-full text-center fade-in">
+            <p class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 font-semibold tracking-wider uppercase text-xs md:text-sm mb-3">Hi, I'm</p>
+            <h1 class="text-zinc-100 text-5xl md:text-7xl font-extrabold tracking-tight mb-4 leading-none font-['Outfit']">
+                Abhishree Shaktawat
+            </h1>
+            <div class="h-10 md:h-12 mb-6 flex justify-center items-center">
+                <p id="typingText" class="text-xl md:text-3xl font-semibold bg-gradient-to-r from-violet-400 via-indigo-400 to-fuchsia-400 bg-clip-text text-transparent typing-cursor"></p>
+            </div>
+            <p class="text-zinc-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+                B.Tech Computer Science student merging engineering precision with business foresight. Experienced in building modern full-stack web experiences and scaling digital products.
+            </p>
+            <div class="flex justify-center gap-4 flex-wrap mb-16">
+                <a href="#projects" class="relative overflow-hidden z-10 px-6 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-medium text-sm flex items-center gap-2 shadow-lg shadow-violet-600/20 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:-translate-y-0.5 transition-all duration-300">
+                    Explore My Works <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+                <a href="#contact" class="relative overflow-hidden z-10 px-6 py-3.5 rounded-xl border border-zinc-700 hover:border-zinc-500 text-zinc-100 font-medium text-sm transition-all duration-300 flex items-center gap-2 bg-[#050505]/40 backdrop-blur-md hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:-translate-y-0.5">
+                    Let's Collaborate <i class="fas fa-comments text-xs"></i>
+                </a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div class="bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col justify-center items-center relative overflow-hidden group hover:border-violet-500/20 transition-all duration-300">
+                    <div class="absolute -right-3 -bottom-3 text-7xl text-zinc-800/10 group-hover:text-violet-500/5 transition-colors"><i class="fas fa-chart-line"></i></div>
+                    <span class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 font-['Outfit']">30L+</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-widest mt-2 font-medium text-center">Sales Generated</span>
+                </div>
+                <div class="bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col justify-center items-center relative overflow-hidden group hover:border-violet-500/20 transition-all duration-300">
+                    <div class="absolute -right-3 -bottom-3 text-7xl text-zinc-800/10 group-hover:text-violet-500/5 transition-colors"><i class="fas fa-shopping-cart"></i></div>
+                    <span class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400 font-['Outfit']">10K+</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-widest mt-2 font-medium text-center">Orders Handled</span>
+                </div>
+                <div class="bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col justify-center items-center relative overflow-hidden group hover:border-violet-500/20 transition-all duration-300">
+                    <div class="absolute -right-3 -bottom-3 text-7xl text-zinc-800/10 group-hover:text-violet-500/5 transition-colors"><i class="fas fa-university"></i></div>
+                    <span class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-fuchsia-400 font-['Outfit']">9.0+</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-widest mt-2 font-medium text-center">Academic CGPA</span>
+                </div>
+                <div class="bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col justify-center items-center relative overflow-hidden group hover:border-violet-500/20 transition-all duration-300">
+                    <div class="absolute -right-3 -bottom-3 text-7xl text-zinc-800/10 group-hover:text-violet-500/5 transition-colors"><i class="fas fa-rocket"></i></div>
+                    <span class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-violet-400 font-['Outfit']">2+</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-widest mt-2 font-medium text-center">Web Internships</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 px-6 relative z-10">
+        <div class="max-w-5xl mx-auto fade-in">
+            <div class="text-center mb-16">
+                <span class="text-violet-400 text-xs font-semibold uppercase tracking-widest">Biography</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-zinc-100 mt-2 font-['Outfit']">About Me</h2>
+                <div class="w-12 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+                <div class="md:col-span-5 flex justify-center">
+                    <div class="relative group">
+                        <div class="profile-rotate absolute inset-[-12px] rounded-full border-2 border-dashed border-violet-500/30"></div>
+                        <div class="absolute inset-[-4px] rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 blur-md opacity-45 group-hover:opacity-75 transition-opacity"></div>
+                        <div class="relative w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-zinc-950">
+                            <img src="resources/Abhishree.png" alt="Abhishree Shaktawat" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                    </div>
+                </div>
+                <div class="md:col-span-7 space-y-6">
+                    <h3 class="text-2xl font-bold text-zinc-100 font-['Outfit']">
+                        Bridging Software Design with Business Growth
+                    </h3>
+                    <p class="text-zinc-400 leading-relaxed text-sm md:text-base">
+                        Hi, I'm <span class="text-white font-semibold">Abhishree Shaktawat</span>, a B.Tech Computer Science student specializing in building clean, intuitive, and high-performance web applications using HTML, CSS, JavaScript, and React. With a solid foundation in Python, C, and Java, I love writing optimized code to solve logical problems.
+                    </p>
+                    <p class="text-zinc-400 leading-relaxed text-sm md:text-base">
+                        Beyond coding, I'm an entrepreneur. I built and managed an e-commerce business that organically generated <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 font-extrabold font-['Outfit']">30+ Lakhs in revenue</span> and shipped over <span class="text-white font-semibold">10,000+ orders</span> inside just 6 months. This has trained me to look at projects strategically, understanding customer priorities, optimization, and conversion.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 text-xs md:text-sm pt-4 border-t border-white/5">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fas fa-graduation-cap text-violet-500 w-4"></i>
+                            <div>
+                                <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Degree</p>
+                                <p class="text-zinc-300 font-medium">B.Tech Computer Science</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fas fa-envelope text-violet-500 w-4"></i>
+                            <div>
+                                <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Email</p>
+                                <p class="text-zinc-300 font-medium break-all text-xs">abhishreeshaktawat.work@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fas fa-map-marker-alt text-violet-500 w-4"></i>
+                            <div>
+                                <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Location</p>
+                                <p class="text-zinc-300 font-medium">India</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <i class="fas fa-language text-violet-500 w-4"></i>
+                            <div>
+                                <p class="text-zinc-500 text-[10px] uppercase tracking-wider">Languages</p>
+                                <p class="text-zinc-300 font-medium">English, Hindi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-24 px-6 relative z-10 bg-[#050505]/40">
+        <div class="max-w-5xl mx-auto fade-in">
+            <div class="text-center mb-12">
+                <span class="text-violet-400 text-xs font-semibold uppercase tracking-widest">Technologies</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-zinc-100 mt-2 font-['Outfit']">Core Skills</h2>
+                <div class="w-12 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div class="flex justify-center gap-2 md:gap-4 mb-12 flex-wrap text-sm font-medium">
+                <button onclick="filterSkills('all')" id="tab-all" class="tab-btn px-4 py-2 rounded-xl bg-violet-600 text-white border border-violet-500/30 transition-all cursor-pointer">
+                    All Skills
+                </button>
+                <button onclick="filterSkills('frontend')" id="tab-frontend" class="tab-btn px-4 py-2 rounded-xl bg-white/5 text-zinc-400 border border-white/5 hover:text-white transition-all cursor-pointer">
+                    Frontend
+                </button>
+                <button onclick="filterSkills('backend')" id="tab-backend" class="tab-btn px-4 py-2 rounded-xl bg-white/5 text-zinc-400 border border-white/5 hover:text-white transition-all cursor-pointer">
+                    Backend
+                </button>
+                <button onclick="filterSkills('tools')" id="tab-tools" class="tab-btn px-4 py-2 rounded-xl bg-white/5 text-zinc-400 border border-white/5 hover:text-white transition-all cursor-pointer">
+                    Tools & Languages
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="skillsGrid">
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(227,79,38,0.2)] hover:border-[#e34f26]/30 cursor-pointer" data-category="frontend">
+                    <div class="w-12 h-12 rounded-xl bg-[#e34f26]/10 flex items-center justify-center">
+                        <i class="fab fa-html5 text-3xl text-[#e34f26]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">HTML5</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(38,77,228,0.2)] hover:border-[#264de4]/30 cursor-pointer" data-category="frontend">
+                    <div class="w-12 h-12 rounded-xl bg-[#264de4]/10 flex items-center justify-center">
+                        <i class="fab fa-css3-alt text-3xl text-[#264de4]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">CSS3</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(247,223,30,0.2)] hover:border-[#f7df1e]/30 cursor-pointer" data-category="frontend">
+                    <div class="w-12 h-12 rounded-xl bg-[#f7df1e]/10 flex items-center justify-center">
+                        <i class="fab fa-js text-3xl text-[#f7df1e]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">JavaScript</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(97,218,251,0.2)] hover:border-[#61dafb]/30 cursor-pointer" data-category="frontend">
+                    <div class="w-12 h-12 rounded-xl bg-[#61dafb]/10 flex items-center justify-center">
+                        <i class="fab fa-react text-3xl text-[#61dafb]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">React</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(56,189,248,0.2)] hover:border-[#38bdf8]/30 cursor-pointer" data-category="frontend">
+                    <div class="w-12 h-12 rounded-xl bg-[#38bdf8]/10 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-[#38bdf8]" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.001,4.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.91,0.23,1.57,0.9,2.29,1.629C13.68,10.648,14.86,11.8,18,11.8c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.91-0.23-1.57-0.9-2.29-1.629C16.32,5.952,15.14,4.8,12.001,4.8z M6.001,11.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.91,0.23,1.57,0.9,2.29,1.63c1.19,1.19,2.37,2.37,5.51,2.37c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.91-0.23-1.57-0.9-2.29-1.63c-1.19-1.19-2.37-2.37-5.51-2.37H6.001z"/>
+                        </svg>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Tailwind CSS</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(121,82,179,0.2)] hover:border-[#7952b3]/30 cursor-pointer" data-category="frontend">
+                    <div class="w-12 h-12 rounded-xl bg-[#7952b3]/10 flex items-center justify-center">
+                        <i class="fab fa-bootstrap text-3xl text-[#7952b3]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Bootstrap</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(55,118,171,0.2)] hover:border-[#3776ab]/30 cursor-pointer" data-category="backend">
+                    <div class="w-12 h-12 rounded-xl bg-[#3776ab]/10 flex items-center justify-center">
+                        <i class="fab fa-python text-3xl text-[#3776ab]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Python</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)] hover:border-white/20 cursor-pointer" data-category="backend">
+                    <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
+                        <i class="fas fa-flask text-2xl text-zinc-100"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Flask</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(51,103,145,0.2)] hover:border-[#336791]/30 cursor-pointer" data-category="backend">
+                    <div class="w-12 h-12 rounded-xl bg-[#336791]/10 flex items-center justify-center">
+                        <i class="fas fa-database text-2xl text-[#336791]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">PostgreSQL</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(242,145,17,0.2)] hover:border-[#f29111]/30 cursor-pointer" data-category="backend">
+                    <div class="w-12 h-12 rounded-xl bg-[#f29111]/10 flex items-center justify-center">
+                        <img src="https://www.svgrepo.com/show/303251/mysql-logo.svg" class="w-8 h-8 filter brightness-110" alt="MySQL">
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">MySQL</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(168,185,204,0.2)] hover:border-[#a8b9cc]/30 cursor-pointer" data-category="tools">
+                    <div class="w-12 h-12 rounded-xl bg-[#a8b9cc]/10 flex items-center justify-center">
+                        <i class="fab fa-cuttlefish text-2xl text-[#a8b9cc]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">C Language</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(176,114,25,0.2)] hover:border-[#b07219]/30 cursor-pointer" data-category="tools">
+                    <div class="w-12 h-12 rounded-xl bg-[#b07219]/10 flex items-center justify-center">
+                        <i class="fab fa-java text-3xl text-[#b07219]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Java</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(240,80,50,0.2)] hover:border-[#f05032]/30 cursor-pointer" data-category="tools">
+                    <div class="w-12 h-12 rounded-xl bg-[#f05032]/10 flex items-center justify-center">
+                        <i class="fab fa-git-alt text-3xl text-[#f05032]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Git</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.1)] hover:border-white/20 cursor-pointer" data-category="tools">
+                    <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
+                        <i class="fab fa-github text-3xl text-zinc-100"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">GitHub</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(242,78,30,0.2)] hover:border-[#f24e1e]/30 cursor-pointer" data-category="tools">
+                    <div class="w-12 h-12 rounded-xl bg-[#f24e1e]/10 flex items-center justify-center">
+                        <i class="fab fa-figma text-3xl text-[#f24e1e]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Figma</span>
+                </div>
+                <div class="skill-item bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,196,196,0.2)] hover:border-[#00c4c4]/30 cursor-pointer" data-category="tools">
+                    <div class="w-12 h-12 rounded-xl bg-[#00c4c4]/10 flex items-center justify-center">
+                        <i class="fas fa-palette text-2xl text-[#00c4c4]"></i>
+                    </div>
+                    <span class="text-zinc-200 font-medium text-sm">Canva</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-24 px-6 relative z-10">
+        <div class="max-w-4xl mx-auto fade-in">
+            <div class="text-center mb-16">
+                <span class="text-violet-400 text-xs font-semibold uppercase tracking-widest">Journey</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-zinc-100 mt-2 font-['Outfit']">Work Experience</h2>
+                <div class="w-12 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div class="relative space-y-12">
+                <div class="absolute left-[19px] md:left-1/3 md:-translate-x-1/2 top-0 w-[2px] h-full bg-gradient-to-b from-violet-500/10 via-violet-500/60 to-violet-500/10 z-0"></div>
+                <div class="flex flex-col md:flex-row relative z-10 gap-6 md:gap-12 items-start">
+                    <div class="flex items-center md:justify-end md:w-1/3 pt-1">
+                        <span class="text-violet-400 bg-violet-400/10 border border-violet-400/20 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider">
+                            Aug 2025 – Oct 2025
+                        </span>
+                    </div>
+                    <div class="absolute left-[13px] md:left-1/3 md:-translate-x-1/2 w-4 h-4 rounded-full bg-[#030303] border-2 border-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)] z-20"></div>
+                    <div class="bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl md:w-2/3 ml-8 md:ml-0 transition-all duration-400 ease-out hover:bg-white/[0.03] hover:border-violet-500/30 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.15)] hover:-translate-y-1">
+                        <h3 class="text-white text-lg font-bold font-['Outfit']">Web Developer Intern</h3>
+                        <p class="text-violet-400 text-sm font-semibold mb-3">Nuvoco Vistas Corporate Limited</p>
+                        <ul class="list-disc list-inside text-zinc-400 text-sm space-y-2 leading-relaxed">
+                            <li>Collaborated with corporate clients to design and deploy 2–3 fully functional, responsive websites.</li>
+                            <li>Gained hands-on competency in full-stack web architectures, optimizing assets and structural assets.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row relative z-10 gap-6 md:gap-12 items-start">
+                    <div class="flex items-center md:justify-end md:w-1/3 pt-1">
+                        <span class="text-violet-400 bg-violet-400/10 border border-violet-400/20 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider">
+                            Jun 2025 – Jul 2025
+                        </span>
+                    </div>
+                    <div class="absolute left-[13px] md:left-1/3 md:-translate-x-1/2 w-4 h-4 rounded-full bg-[#030303] border-2 border-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.6)] z-20"></div>
+                    <div class="bg-white/[0.015] backdrop-blur-xl border border-white/5 p-6 rounded-2xl md:w-2/3 ml-8 md:ml-0 transition-all duration-400 ease-out hover:bg-white/[0.03] hover:border-violet-500/30 hover:shadow-[0_10px_40px_-10px_rgba(139,92,246,0.15)] hover:-translate-y-1">
+                        <h3 class="text-white text-lg font-bold font-['Outfit']">Frontend Developer Intern</h3>
+                        <p class="text-violet-400 text-sm font-semibold mb-3">Creative Textile</p>
+                        <ul class="list-disc list-inside text-zinc-400 text-sm space-y-2 leading-relaxed">
+                            <li>Engineered and optimized web interfaces using HTML, CSS, and modern JavaScript practices.</li>
+                            <li>Enhanced visual elements to resolve layouts for improved user retention and brand cohesion.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row relative z-10 gap-6 md:gap-12 items-start">
+                    <div class="flex items-center md:justify-end md:w-1/3 pt-1">
+                        <span class="text-fuchsia-400 bg-fuchsia-400/10 border border-fuchsia-400/20 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider">
+                            Dec 2024 – Present
+                        </span>
+                    </div>
+                    <div class="absolute left-[13px] md:left-1/3 md:-translate-x-1/2 w-4 h-4 rounded-full bg-[#030303] border-2 border-fuchsia-500 shadow-[0_0_10px_rgba(217,70,239,0.6)] z-20"></div>
+                    <div class="bg-white/[0.015] backdrop-blur-xl border border-fuchsia-500/10 p-6 rounded-2xl md:w-2/3 ml-8 md:ml-0 transition-all duration-400 ease-out hover:bg-white/[0.03] hover:border-fuchsia-500/30 hover:shadow-[0_10px_40px_-10px_rgba(217,70,239,0.15)] hover:-translate-y-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-white text-lg font-bold font-['Outfit']">E-commerce Business Owner</h3>
+                            <span class="bg-gradient-to-r from-fuchsia-500 to-violet-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Success Story</span>
+                        </div>
+                        <p class="text-fuchsia-400 text-sm font-semibold mb-3">Independent Ventures</p>
+                        <ul class="list-disc list-inside text-zinc-400 text-sm space-y-2 leading-relaxed">
+                            <li>Scaled revenue to <span class="text-white font-medium font-['Outfit']">INR 30+ Lakhs organically</span> in under 6 months.</li>
+                            <li>Orchestrated order routing, listing optimizations, and logistics pipelines for <span class="text-white font-medium">10,000+ total orders</span>.</li>
+                            <li>Applied performance data models to select high-performing products across 30+ unique SKUs.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-24 px-6 relative z-10 bg-[#050505]/40">
+        <div class="max-w-5xl mx-auto fade-in">
+            <div class="text-center mb-16">
+                <span class="text-violet-400 text-xs font-semibold uppercase tracking-widest">Portfolio</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-zinc-100 mt-2 font-['Outfit']">Recent Projects</h2>
+                <div class="w-12 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="project-card tilt-card bg-white/[0.015] backdrop-blur-xl border border-white/5 rounded-2xl p-6 flex flex-col justify-between hover:border-violet-500/30 transition-all duration-300 relative group cursor-default">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-tr-2xl -z-10 pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-violet-400 text-lg"></i>
+                            </span>
+                            <span class="text-xxs text-zinc-500 uppercase tracking-widest font-bold">Web Application</span>
+                        </div>
+                        <h3 class="text-white text-xl font-bold mb-2 group-hover:text-violet-400 transition-colors font-['Outfit']">Cutodo</h3>
+                        <p class="text-zinc-400 text-sm mb-6 leading-relaxed text-xs">
+                            A minimal and distraction-free task management tool built with calendar integration, enabling users to schedule, catalog, and prioritize daily objectives seamlessly.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">HTML5</span>
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">CSS Flexbox</span>
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="https://cutodo-list-121.netlify.app/" target="_blank" class="relative overflow-hidden z-10 flex-1 text-center bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-violet-600/10 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] flex items-center justify-center gap-1.5">
+                            Live Demo <i class="fas fa-external-link-alt text-[10px]"></i>
+                        </a>
+                        <a href="https://github.com/Saw-titan/cutodo-list" target="_blank" class="flex-1 text-center border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-xs font-semibold py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 bg-[#030303]/40">
+                            GitHub <i class="fab fa-github text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="project-card tilt-card bg-white/[0.015] backdrop-blur-xl border border-white/5 rounded-2xl p-6 flex flex-col justify-between hover:border-violet-500/30 transition-all duration-300 relative group cursor-default">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-tr-2xl -z-10 pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                                <i class="fas fa-dog text-violet-400 text-lg"></i>
+                            </span>
+                            <span class="text-xxs text-zinc-500 uppercase tracking-widest font-bold">API Integration</span>
+                        </div>
+                        <h3 class="text-white text-xl font-bold mb-2 group-hover:text-violet-400 transition-colors font-['Outfit']">Pupstagram</h3>
+                        <p class="text-zinc-400 text-sm mb-6 leading-relaxed text-xs">
+                            An interactive interface dedicated to fetching, filtering, and saving stock dog images from a public endpoint using responsive grid layouts.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">HTML5</span>
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">CSS Grid</span>
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="https://pupstagram-121.netlify.app/" target="_blank" class="relative overflow-hidden z-10 flex-1 text-center bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-violet-600/10 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] flex items-center justify-center gap-1.5">
+                            Live Demo <i class="fas fa-external-link-alt text-[10px]"></i>
+                        </a>
+                        <a href="https://github.com/Saw-titan/Pupstagram" target="_blank" class="flex-1 text-center border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-xs font-semibold py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 bg-[#030303]/40">
+                            GitHub <i class="fab fa-github text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="project-card tilt-card bg-white/[0.015] backdrop-blur-xl border border-white/5 rounded-2xl p-6 flex flex-col justify-between hover:border-violet-500/30 transition-all duration-300 relative group cursor-default">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-tr-2xl -z-10 pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                                <i class="fas fa-user-circle text-violet-400 text-lg"></i>
+                            </span>
+                            <span class="text-xxs text-zinc-500 uppercase tracking-widest font-bold">Creative Web</span>
+                        </div>
+                        <h3 class="text-white text-xl font-bold mb-2 group-hover:text-violet-400 transition-colors font-['Outfit']">Developer Portfolio</h3>
+                        <p class="text-zinc-400 text-sm mb-6 leading-relaxed text-xs">
+                            Personal hub with customized glassmorphism styling, a floating canvas rendering system, dynamic tab filters, and full keyboard accessibility.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">HTML5</span>
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">Tailwind CSS</span>
+                            <span class="text-[10px] text-zinc-400 bg-white/5 border border-white/5 px-2.5 py-1 rounded-lg">Canvas API</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="#" class="relative overflow-hidden z-10 flex-1 text-center bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold py-2.5 rounded-xl transition-all duration-300 shadow-md shadow-violet-600/10 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] flex items-center justify-center gap-1.5">
+                            Live Demo <i class="fas fa-external-link-alt text-[10px]"></i>
+                        </a>
+                        <a href="#" class="flex-1 text-center border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-xs font-semibold py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 bg-[#030303]/40">
+                            GitHub <i class="fab fa-github text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-24 px-6 relative z-10">
+        <div class="max-w-5xl mx-auto fade-in">
+            <div class="text-center mb-16">
+                <span class="text-violet-400 text-xs font-semibold uppercase tracking-widest">Connect</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-zinc-100 mt-2 font-['Outfit']">Get In Touch</h2>
+                <div class="w-12 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div class="max-w-2xl mx-auto space-y-8 text-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-zinc-100 mb-4 font-['Outfit']">Let's create something great</h3>
+                    <p class="text-zinc-400 text-base leading-relaxed">
+                        Whether you have an internship opening, a freelance project, or simply want to chat about code or business — my inbox is always open.
+                    </p>
+                </div>
+                <div class="bg-white/[0.015] backdrop-blur-xl border border-white/5 p-8 rounded-2xl space-y-6 text-left max-w-lg mx-auto">
+                    <div class="flex items-center gap-4 group">
+                        <span class="w-12 h-12 rounded-xl bg-violet-500/10 group-hover:bg-violet-500/20 transition-colors flex items-center justify-center text-violet-400 text-lg">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <div>
+                            <p class="text-zinc-500 text-[10px] uppercase tracking-wider font-semibold">Email Address</p>
+                            <a href="mailto:abhishreeshaktawat.work@gmail.com" class="text-zinc-200 hover:text-violet-400 transition-colors text-sm font-medium">
+                                abhishreeshaktawat.work@gmail.com
+                            </a>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 group">
+                        <span class="w-12 h-12 rounded-xl bg-violet-500/10 group-hover:bg-violet-500/20 transition-colors flex items-center justify-center text-violet-400 text-lg">
+                            <i class="fab fa-linkedin-in"></i>
+                        </span>
+                        <div>
+                            <p class="text-zinc-500 text-[10px] uppercase tracking-wider font-semibold">LinkedIn Profile</p>
+                            <a href="https://www.linkedin.com/in/abhishree-shaktawat-3bb30a308/" target="_blank" class="text-zinc-200 hover:text-violet-400 transition-colors text-sm font-medium">
+                                linkedin.com/in/abhishree-shaktawat
+                            </a>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 group">
+                        <span class="w-12 h-12 rounded-xl bg-violet-500/10 group-hover:bg-violet-500/20 transition-colors flex items-center justify-center text-violet-400 text-lg">
+                            <i class="fab fa-github"></i>
+                        </span>
+                        <div>
+                            <p class="text-zinc-500 text-[10px] uppercase tracking-wider font-semibold">GitHub Handle</p>
+                            <a href="https://github.com/Saw-titan" target="_blank" class="text-zinc-200 hover:text-violet-400 transition-colors text-sm font-medium">
+                                github.com/Saw-titan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#030303] border-t border-white/[0.04] py-8 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-zinc-500 text-sm">© 2026 Abhishree Shaktawat. All rights reserved.</p>
+            <p class="text-zinc-500 text-sm flex items-center gap-1.5">
+                Designed with <i class="fas fa-heart text-violet-500"></i> & Tailwind CSS
+            </p>
+        </div>
+    </footer>
+
+    <button id="scrollTopBtn" class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white flex items-center justify-center text-lg cursor-pointer opacity-0 visibility-hidden transition-all duration-300 z-40 shadow-xl shadow-violet-600/30">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const typingElement = document.getElementById('typingText');
+        const texts = [
+            "Full-Stack Web Developer",
+            "B.Tech CS Student",
+            "E-commerce Entrepreneur"
+        ];
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        
+        function typeEffect() {
+            const currentText = texts[textIndex];
+            if (isDeleting) {
+                typingElement.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+            }
+            if (!isDeleting && charIndex === currentText.length) {
+                isDeleting = true;
+                setTimeout(typeEffect, 2000);
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % texts.length;
+                setTimeout(typeEffect, 500);
+            } else {
+                setTimeout(typeEffect, isDeleting ? 80 : 120);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(typeEffect, 800);
+            initCanvas();
+        });
+
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenu = document.getElementById('closeMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.remove('translate-x-full');
+        });
+        closeMenu.addEventListener('click', () => {
+            mobileMenu.classList.add('translate-x-full');
+        });
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+            });
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                mobileMenu.classList.add('translate-x-full');
+            }
+        });
+
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const observerOptions = { threshold: 0.05, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        fadeElements.forEach(el => observer.observe(el));
+
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollY = window.pageYOffset;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 120;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.className = "nav-link text-zinc-400 hover:text-white relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 hover:after:w-full py-1";
+                if (link.getAttribute('href') === '#' + current) {
+                    link.className = "nav-link text-white active relative after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:bg-gradient-to-r after:from-violet-500 after:to-fuchsia-500 after:transition-all after:duration-300 py-1";
+                }
+            });
+
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            if (scrollY > 400) {
+                scrollTopBtn.classList.remove('opacity-0', 'visibility-hidden');
+                scrollTopBtn.classList.add('opacity-100');
+            } else {
+                scrollTopBtn.classList.remove('opacity-100');
+                scrollTopBtn.classList.add('opacity-0', 'visibility-hidden');
+            }
+        });
+        document.getElementById('scrollTopBtn').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        let canvas, ctx;
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 100 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.baseX = x;
+                this.baseY = y;
+                this.density = (Math.random() * 30) + 5;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.4)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                if (mouse.x != null && mouse.y != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        let force = (mouse.radius - distance) / mouse.radius;
+                        let directionX = dx / distance;
+                        let directionY = dy / distance;
+                        this.x += directionX * force * 1.5;
+                        this.y += directionY * force * 1.5;
+                    }
+                }
+            }
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('particleCanvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            animateParticles();
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            let numberOfParticles = Math.floor((canvas.width * canvas.height) / 16000);
+            if (numberOfParticles > 120) numberOfParticles = 120;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                particles.push(new Particle(x, y));
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            connectParticles();
+            requestAnimationFrame(animateParticles);
+        }
+
+        function connectParticles() {
+            let maxDistance = 120;
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < maxDistance) {
+                        let alpha = (1 - (distance / maxDistance)) * 0.12;
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        const cursorFollower = document.getElementById('cursorFollower');
+        let cursorX = 0, cursorY = 0;
+        let targetX = 0, targetY = 0;
+        const speed = 0.12;
+
+        window.addEventListener('mousemove', (e) => {
+            targetX = e.clientX;
+            targetY = e.clientY;
+        });
+
+        function updateCursor() {
+            cursorX += (targetX - cursorX) * speed;
+            cursorY += (targetY - cursorY) * speed;
+            cursorFollower.style.left = cursorX + 'px';
+            cursorFollower.style.top = cursorY + 'px';
+            requestAnimationFrame(updateCursor);
+        }
+        updateCursor();
+
+        const hoverables = document.querySelectorAll('a, button, [onclick], .skill-item');
+        hoverables.forEach(elem => {
+            elem.addEventListener('mouseenter', () => {
+                cursorFollower.style.width = '48px';
+                cursorFollower.style.height = '48px';
+                cursorFollower.style.borderColor = 'rgba(217, 70, 239, 0.8)';
+                cursorFollower.style.backgroundColor = 'rgba(217, 70, 239, 0.08)';
+            });
+            elem.addEventListener('mouseleave', () => {
+                cursorFollower.style.width = '32px';
+                cursorFollower.style.height = '32px';
+                cursorFollower.style.borderColor = 'rgba(139, 92, 246, 0.5)';
+                cursorFollower.style.backgroundColor = 'rgba(139, 92, 246, 0.05)';
+            });
+        });
+
+        function filterSkills(category) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 rounded-xl bg-white/5 text-zinc-400 border border-white/5 hover:text-white transition-all cursor-pointer";
+            });
+            const activeBtn = document.getElementById('tab-' + category);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-4 py-2 rounded-xl bg-violet-600 text-white border border-violet-500/30 transition-all cursor-pointer";
+            }
+            document.querySelectorAll('.skill-item').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                    }, 50);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (centerY - y) / 12;
+                const rotateY = (x - centerX) / 12;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+                card.style.borderColor = 'rgba(139, 92, 246, 0.4)';
+                card.style.boxShadow = `0 15px 45px -10px rgba(139, 92, 246, 0.2)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+                card.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                card.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
